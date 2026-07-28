@@ -10,5 +10,7 @@ test("访问首页时显示产品标题", () => {
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("heading", { name: "粒子空间" })).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "粒子空间代理 2.0" }),
+  ).toBeInTheDocument();
 });

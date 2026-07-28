@@ -1,4 +1,5 @@
 import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { WorkspacePage } from "./pages/WorkspacePage";
 
 function PagePlaceholder({
   title,
@@ -42,14 +43,14 @@ export function App() {
       <header className="topbar">
         <Link className="product-link" to="/">
           <span className="product-mark" aria-hidden="true" />
-          <h1>粒子空间</h1>
+          <h1>粒子空间代理 2.0</h1>
         </Link>
         <Link className="workspace-link" to="/">项目工作台</Link>
       </header>
 
       <main className="page-content">
         <Routes>
-          <Route path="/" element={<PagePlaceholder title="项目工作台" description="项目列表与新建入口将在后续阶段实现。" />} />
+          <Route path="/" element={<WorkspacePage />} />
           <Route path="/projects/new" element={<PagePlaceholder title="创建项目" description="CAD、图片与既有 3D 模型上传将在后续阶段实现。" />} />
           <Route path="/tasks/:taskId" element={<TaskPage />} />
           <Route path="/models/:taskId" element={<ModelPage />} />
