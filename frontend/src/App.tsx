@@ -1,4 +1,6 @@
 import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { CreateProjectPage } from "./pages/CreateProjectPage";
+import { TaskPage } from "./pages/TaskPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
 
 function PagePlaceholder({
@@ -17,15 +19,6 @@ function PagePlaceholder({
   );
 }
 
-function TaskPage() {
-  const { taskId } = useParams();
-  return (
-    <PagePlaceholder
-      title="任务详情"
-      description={`任务 ID：${taskId ?? "未知"}。异步状态将在后续阶段接入。`}
-    />
-  );
-}
 
 function ModelPage() {
   const { taskId } = useParams();
@@ -51,7 +44,7 @@ export function App() {
       <main className="page-content">
         <Routes>
           <Route path="/" element={<WorkspacePage />} />
-          <Route path="/projects/new" element={<PagePlaceholder title="创建项目" description="CAD、图片与既有 3D 模型上传将在后续阶段实现。" />} />
+          <Route path="/projects/new" element={<CreateProjectPage />} />
           <Route path="/tasks/:taskId" element={<TaskPage />} />
           <Route path="/models/:taskId" element={<ModelPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
