@@ -172,7 +172,11 @@ export function WorkspacePage() {
         </aside>
       </div>
 
-      <section className="recent-panel" aria-labelledby="recent-heading">
+      <section
+        className="recent-panel"
+        id="recent-projects"
+        aria-labelledby="recent-heading"
+      >
         <div className="recent-panel-heading">
           <div>
             <h2 id="recent-heading">最近项目</h2>
