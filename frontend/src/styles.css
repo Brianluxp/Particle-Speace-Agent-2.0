@@ -1360,3 +1360,264 @@ a { color: inherit; }
     display: none;
   }
 }
+
+/* Shared dark treatment for create, task and model routes */
+.back-link {
+  color: #8da6bb;
+}
+
+.back-link:hover {
+  color: var(--cyan);
+}
+
+.create-layout,
+.task-panel,
+.model-workbench,
+.model-state-card,
+.task-loading,
+.task-error-card {
+  border-color: var(--line);
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
+}
+
+.create-intro {
+  border-right: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 12% 80%, rgba(29, 205, 208, .16), transparent 30%),
+    var(--surface-2);
+}
+
+.create-intro > p:not(.section-index) {
+  color: #8ea6ba;
+}
+
+.create-steps li {
+  color: #718ba2;
+}
+
+.create-steps li:not(:last-child)::after {
+  background: rgba(157, 194, 221, .2);
+}
+
+.create-steps span {
+  border-color: rgba(157, 194, 221, .3);
+}
+
+.create-steps .is-current span {
+  border-color: var(--cyan);
+  background: rgba(29, 205, 208, .16);
+}
+
+.project-form,
+.task-copy,
+.model-toolbar {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.form-heading {
+  border-color: var(--line);
+}
+
+.form-heading span,
+.section-index {
+  color: var(--cyan);
+}
+
+.form-heading h3,
+.task-copy h2,
+.model-page-heading h2,
+.model-state-card h2 {
+  color: var(--text);
+}
+
+.form-heading .form-state,
+.field-label,
+.task-copy > p:not(.section-index):not(.form-error),
+.model-page-heading p:last-child,
+.model-page-heading > span,
+.model-state-card p {
+  color: var(--muted);
+}
+
+.text-field,
+.select-field {
+  border-color: var(--line);
+  color: var(--text);
+  background: var(--surface-2);
+  color-scheme: dark;
+}
+
+.text-field::placeholder {
+  color: #5f788d;
+}
+
+.text-field:focus,
+.select-field:focus {
+  border-color: rgba(29, 205, 208, .65);
+  box-shadow: 0 0 0 3px rgba(29, 205, 208, .08);
+}
+
+.file-field {
+  border-color: rgba(157, 194, 221, .3);
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.file-field:hover,
+.file-field.has-file {
+  border-color: rgba(29, 205, 208, .65);
+  background: rgba(16, 39, 60, .92);
+}
+
+.file-icon {
+  border-color: rgba(29, 205, 208, .45);
+  color: var(--cyan);
+}
+
+.file-field strong {
+  color: var(--text);
+}
+
+.file-field small {
+  color: var(--muted);
+}
+
+.field-message {
+  color: #d4a85d;
+}
+
+.form-error {
+  color: #f08079;
+}
+
+.submit-project {
+  background: linear-gradient(135deg, #20a9df, var(--blue));
+  box-shadow: 0 10px 24px rgba(22, 135, 255, .18);
+}
+
+.submit-project:hover:not(:disabled) {
+  background: linear-gradient(135deg, #25b9e8, #238ff8);
+}
+
+.submit-project:disabled {
+  color: #5f778a;
+  background: #132a3e;
+}
+
+.task-toolbar > span {
+  color: var(--muted);
+}
+
+.progress-heading span {
+  color: #9ab1c4;
+}
+
+.progress-heading strong {
+  color: var(--cyan);
+}
+
+.progress-track {
+  background: #173049;
+}
+
+.progress-track > span {
+  background: linear-gradient(90deg, #1687ff, #1dcdd0);
+}
+
+.task-visual,
+.model-stage {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(29, 205, 208, .14), transparent 34%),
+    var(--bg);
+}
+
+.task-completed .task-visual {
+  background:
+    radial-gradient(circle, rgba(39, 213, 160, .16), transparent 34%),
+    var(--bg);
+}
+
+.task-failed .task-visual {
+  background:
+    radial-gradient(circle, rgba(216, 88, 88, .12), transparent 34%),
+    #15131b;
+}
+
+.failure-box {
+  border-color: #d95858;
+  background: rgba(110, 36, 42, .2);
+}
+
+.failure-box span {
+  color: #d19a9a;
+}
+
+.failure-box strong {
+  color: #f09a94;
+}
+
+.task-loading,
+.task-error-card {
+  color: var(--muted);
+}
+
+.model-workbench {
+  background: var(--surface);
+}
+
+.model-toolbar {
+  border-color: var(--line);
+}
+
+.model-actions button,
+.model-actions a {
+  border-color: var(--line);
+  color: #a8bed0;
+  background: var(--surface-2);
+}
+
+.model-actions button:hover,
+.model-actions a:hover {
+  border-color: rgba(29, 205, 208, .55);
+  color: var(--cyan);
+  background: var(--surface-3);
+}
+
+.model-actions a {
+  border-color: var(--blue);
+  color: #fff;
+  background: var(--blue);
+}
+
+.model-actions a:hover {
+  color: #fff;
+  background: #238ff8;
+}
+
+.model-state-card {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(29, 205, 208, .08), transparent 28%),
+    var(--surface);
+}
+
+.state-code {
+  color: var(--cyan);
+}
+
+.secondary-action {
+  border-color: rgba(29, 205, 208, .35);
+  color: var(--cyan);
+}
+
+.secondary-action:hover {
+  border-color: var(--cyan);
+  background: rgba(29, 205, 208, .08);
+}
+
+.model-empty-state .state-symbol {
+  border-color: rgba(29, 205, 208, .45);
+  color: var(--cyan);
+}
