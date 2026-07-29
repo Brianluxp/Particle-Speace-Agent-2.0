@@ -108,6 +108,9 @@ describe("TaskPage", () => {
       )
       .mockResolvedValueOnce(
         makeTask("completed", 100, { stageLabel: "生成完成" }),
+      )
+      .mockResolvedValueOnce(
+        makeTask("completed", 100, { stageLabel: "生成完成" }),
       );
     renderTaskPage();
 
@@ -120,7 +123,7 @@ describe("TaskPage", () => {
     expect(screen.getByTestId("location")).toHaveTextContent(
       "/models/task-monitor",
     );
-    expect(getTask).toHaveBeenCalledTimes(2);
+    expect(getTask).toHaveBeenCalledTimes(3);
   });
 
   test("retries a failed task and returns it to queued", async () => {

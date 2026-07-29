@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { FAILED_TASK_ID } from "../mocks/projects";
+import type { InputType } from "../types/task";
 import {
   createProject,
   getRecentProjects,
@@ -8,20 +9,24 @@ import {
 } from "./projectApi";
 
 describe("projectApi", () => {
-  test("creates a queued generation task", async () => {
-    const file = new File(["drawing"], "valve.dxf", {
-      type: "application/dxf",
-    });
+  test.each(
+    [
+      ["cad", "valve.dxf"],
+      ["image", "valve.png"],
+      ["model", "valve.glb"],
+    ] satisfies Array<[InputType, string]>,
+  )("creates a queued %s generation task", async (inputType, fileName) => {
+    const file = new File(["input"], fileName);
 
     const task = await createProject({
       name: "阀门执行器",
-      inputType: "cad",
+      inputType,
       file,
     });
 
     expect(task).toMatchObject({
       projectId: expect.any(String),
-      inputType: "cad",
+      inputType,
       status: "queued",
       progress: 0,
       stageLabel: "排队中",
