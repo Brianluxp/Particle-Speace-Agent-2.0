@@ -79,7 +79,7 @@ describe("projectApi", () => {
     expect(projects.map((project) => project.name)).toEqual([
       "阀门执行器",
       "四冲程发动机",
-      "BMX 车架",
+      "BMX车架",
     ]);
   });
 });

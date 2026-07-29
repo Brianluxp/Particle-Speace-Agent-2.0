@@ -7,42 +7,41 @@ const inputOptions: Array<{
   type: InputType;
   title: string;
   support: string;
-  code: string;
   recommended?: boolean;
 }> = [
   {
     type: "cad",
     title: "CAD 图纸生成 3D",
-    support: "支持 DWG、DXF、PDF、PNG",
-    code: "DWG / DXF",
+    support: "支持DWG、DXF、PDF、PNG",
     recommended: true,
   },
   {
     type: "image",
-    title: "产品图片生成 3D",
-    support: "支持单图或多视角图片",
-    code: "IMG / MULTI",
+    title: "产品图片生成3D",
+    support: "支持单图矩阵图片",
   },
   {
     type: "model",
-    title: "导入现有 3D 模型",
-    support: "支持 FBX、OBJ、GLB",
-    code: "FBX / GLB",
+    title: "导入现有3D模型",
+    support: "支持FBX、OBJ、GLB",
   },
 ];
 
 const inputTypeLabels: Record<InputType, string> = {
-  cad: "CAD 图纸",
+  cad: "CAD图纸",
   image: "产品图片",
-  model: "3D 模型",
+  model: "3D模型",
 };
 
-const statusLabels: Record<TaskStatus, string> = {
-  queued: "等待处理",
-  parsing: "结构解析中",
-  generating: "3D 生成中",
-  completed: "3D 模型已生成",
-  failed: "生成失败",
+const statusPresentation: Record<
+  TaskStatus,
+  { label: string; progress: number }
+> = {
+  queued: { label: "等待参数确认", progress: 42 },
+  parsing: { label: "结构解析中", progress: 56 },
+  generating: { label: "动态效果生成中", progress: 68 },
+  completed: { label: "3D模型已生成", progress: 100 },
+  failed: { label: "生成失败", progress: 0 },
 };
 
 function InputIcon({ type }: { type: InputType }) {
@@ -73,13 +72,29 @@ function InputIcon({ type }: { type: InputType }) {
 }
 
 function formatProjectTime(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
-    month: "numeric",
-    day: "numeric",
+  const date = new Date(value);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const sameDay = (left: Date, right: Date) =>
+    left.getFullYear() === right.getFullYear()
+    && left.getMonth() === right.getMonth()
+    && left.getDate() === right.getDate();
+
+  const time = new Intl.DateTimeFormat("zh-CN", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).format(new Date(value));
+  }).format(date);
+
+  if (sameDay(date, today)) {
+    return `今天 ${time}`;
+  }
+  if (sameDay(date, yesterday)) {
+    return `昨天 ${time}`;
+  }
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
 export function WorkspacePage() {
@@ -101,123 +116,104 @@ export function WorkspacePage() {
 
   return (
     <div className="workspace-page">
-      <section className="workspace-hero">
-        <div className="hero-copy">
-          <p className="eyebrow">AGENT 3D STUDIO / 01</p>
-          <h2>Agent 3D 制作工作台</h2>
-          <p className="hero-tagline">把图纸和图片，变成可运行的 3D</p>
-          <p className="hero-description">
-            导入 CAD 图纸、产品图片或现有模型，Agent
-            将引导完成解析、建模、动态效果与网页发布。
+      <section className="page-intro">
+        <div>
+          <p className="eyebrow">✦ Agent 3D 制作工作台</p>
+          <h2>把图纸和图片，变成可运行的3D</h2>
+          <p>
+            导入CAD图纸、产品图片或现有模型，Agent将引导完成解析、建模、动态效果与网页发布。
           </p>
-          <Link className="primary-action" to="/projects/new">
-            创建新项目
-            <span aria-hidden="true">↗</span>
-          </Link>
         </div>
-
-        <aside className="hero-system" aria-label="Agent 能力">
-          <div className="system-head">
-            <span>AGENT PIPELINE</span>
-            <i aria-hidden="true" />
-          </div>
-          <div className="system-orbit" aria-hidden="true">
-            <span className="orbit-core">3D</span>
-            <span className="orbit orbit-one" />
-            <span className="orbit orbit-two" />
-          </div>
-          <div className="system-metrics">
-            <div>
-              <span>01</span>
-              <strong>AI 结构识别</strong>
-            </div>
-            <div>
-              <span>02</span>
-              <strong>运动关系</strong>
-            </div>
-          </div>
-        </aside>
+        <Link className="primary-action" to="/projects/new">
+          <span aria-hidden="true">＋</span>
+          创建新项目
+        </Link>
       </section>
 
-      <section className="workspace-section" aria-labelledby="input-heading">
-        <div className="section-heading">
-          <div>
-            <p className="section-index">01 / INPUT</p>
+      <div className="home-grid">
+        <section className="quick-start" aria-labelledby="input-heading">
+          <div className="panel-heading">
             <h2 id="input-heading">从什么开始？</h2>
-            <p>选择一种输入方式，后续步骤均由 Agent 引导完成</p>
+            <p>选择一种输入方式，后续步骤均由Agent引导完成</p>
           </div>
-          <span className="section-rule" aria-hidden="true" />
-        </div>
 
-        <div className="input-grid">
-          {inputOptions.map((option) => (
-            <Link
-              className="input-card"
-              key={option.type}
-              to={`/projects/new?type=${option.type}`}
-            >
-              <div className="input-card-top">
+          <div className="input-list">
+            {inputOptions.map((option) => (
+              <Link
+                className={`input-card input-${option.type}`}
+                key={option.type}
+                to={`/projects/new?type=${option.type}`}
+              >
                 <span className="input-icon">
                   <InputIcon type={option.type} />
                 </span>
-                <span className="input-code">{option.code}</span>
-              </div>
-              <div className="input-card-body">
-                <div className="input-title-row">
-                  <h3>{option.title}</h3>
-                  {option.recommended ? (
-                    <span className="recommended-badge">推荐</span>
-                  ) : null}
-                </div>
-                <p>{option.support}</p>
-              </div>
-              <span className="card-arrow" aria-hidden="true">
-                →
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="workspace-section recent-section" aria-labelledby="recent-heading">
-        <div className="section-heading recent-heading">
-          <div>
-            <p className="section-index">02 / RECENT</p>
-            <h2 id="recent-heading">最近项目</h2>
-            <p>继续上次的制作进度</p>
+                <span className="input-arrow" aria-hidden="true">→</span>
+                <span className="input-card-body">
+                  <span className="input-title-row">
+                    <strong>{option.title}</strong>
+                    {option.recommended ? (
+                      <span className="recommended-badge">推荐</span>
+                    ) : null}
+                  </span>
+                  <small>{option.support}</small>
+                </span>
+              </Link>
+            ))}
           </div>
-          <span className="project-count">{projects.length} 个项目</span>
+        </section>
+
+        <aside className="prototype-visual" aria-label="阀门执行器模型识别预览">
+          <img
+            src="/valve-actuator-viewport.png"
+            alt="阀门执行器三维模型"
+          />
+          <span className="visual-tag visual-tag-structure">AI结构识别</span>
+          <span className="visual-tag visual-tag-motion">运动关系</span>
+        </aside>
+      </div>
+
+      <section className="recent-panel" aria-labelledby="recent-heading">
+        <div className="recent-panel-heading">
+          <div>
+            <h2 id="recent-heading">最近项目</h2>
+            <p>继续上次的制作细节</p>
+          </div>
+          <button type="button">
+            查看全部 <span aria-hidden="true">→</span>
+          </button>
         </div>
 
         <div className="project-list">
-          {projects.map((project, index) => (
-            <Link
-              className="project-row"
-              key={project.id}
-              to={`/tasks/${project.taskId}`}
-            >
-              <span className="project-number">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span className={`project-symbol symbol-${project.inputType}`}>
-                <InputIcon type={project.inputType} />
-              </span>
-              <span className="project-identity">
-                <strong>{project.name}</strong>
-                <small>{inputTypeLabels[project.inputType]}</small>
-              </span>
-              <span className={`project-status status-${project.status}`}>
-                <i aria-hidden="true" />
-                {statusLabels[project.status]}
-              </span>
-              <time dateTime={project.createdAt}>
-                {formatProjectTime(project.createdAt)}
-              </time>
-              <span className="project-arrow" aria-hidden="true">
-                ↗
-              </span>
-            </Link>
-          ))}
+          {projects.map((project) => {
+            const presentation = statusPresentation[project.status];
+
+            return (
+              <Link
+                className="project-row"
+                key={project.id}
+                to={`/tasks/${project.taskId}`}
+              >
+                <span className={`project-symbol symbol-${project.inputType}`}>
+                  <InputIcon type={project.inputType} />
+                </span>
+                <span className="project-identity">
+                  <strong>{project.name}</strong>
+                  <small>{inputTypeLabels[project.inputType]}</small>
+                </span>
+                <span className={`project-status status-${project.status}`}>
+                  <i aria-hidden="true" />
+                  {presentation.label}
+                </span>
+                <span className="project-progress" aria-hidden="true">
+                  <i style={{ width: `${presentation.progress}%` }} />
+                </span>
+                <time dateTime={project.createdAt}>
+                  {formatProjectTime(project.createdAt)}
+                </time>
+                <span className="project-arrow" aria-hidden="true">→</span>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>
