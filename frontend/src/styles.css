@@ -186,10 +186,6 @@ a { color: inherit; }
   color: #0d365b;
   background: #d8e8f3;
 }
-.rail-link-disabled {
-  cursor: not-allowed;
-  opacity: .52;
-}
 .side-rail-footer {
   display: grid;
   justify-items: center;

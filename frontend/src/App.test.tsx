@@ -1,9 +1,36 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { App } from "./App";
+import {
+  DEFAULT_MODEL_TASK_ID,
+  recentProjects,
+} from "./mocks/projects";
+import { getRecentProjects } from "./services/projectApi";
 
-afterEach(cleanup);
+vi.mock("./services/projectApi", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./services/projectApi")>();
+
+  return {
+    ...actual,
+    getRecentProjects: vi.fn(),
+  };
+});
+
+beforeEach(() => {
+  vi.mocked(getRecentProjects).mockResolvedValue(structuredClone(recentProjects));
+});
+
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 test("显示粒子空间应用框架", () => {
   render(
@@ -12,7 +39,9 @@ test("显示粒子空间应用框架", () => {
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("heading", { name: "粒子空间" })).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "Particle Space 2.0" }),
+  ).toBeInTheDocument();
   expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "导入" })).toHaveAttribute(
     "aria-current",
@@ -37,53 +66,82 @@ test.each([
   );
 });
 
-test("没有任务上下文时禁用任务和模型入口", () => {
+test("首页任务和模型入口打开最近目标", async () => {
   render(
     <MemoryRouter>
       <App />
     </MemoryRouter>,
   );
 
-  expect(
-    screen.getByRole("button", { name: "任务：请先选择项目" }),
-  ).toBeDisabled();
-  expect(
-    screen.getByRole("button", { name: "模型：请先选择项目" }),
-  ).toBeDisabled();
+  await waitFor(() => {
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
+      "href",
+      "/tasks/task-valve",
+    );
+    expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
+      "href",
+      "/models/task-engine",
+    );
+  });
 });
 
-test("任务路由使用当前任务生成上下文导航", () => {
+test("没有最近项目时使用默认模型任务", async () => {
+  vi.mocked(getRecentProjects).mockResolvedValueOnce([]);
+
+  render(
+    <MemoryRouter initialEntries={["/projects/new"]}>
+      <App />
+    </MemoryRouter>,
+  );
+
+  await waitFor(() => {
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
+      "href",
+      `/tasks/${DEFAULT_MODEL_TASK_ID}`,
+    );
+    expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
+      "href",
+      `/models/${DEFAULT_MODEL_TASK_ID}`,
+    );
+  });
+});
+
+test("任务路由保留当前任务并指向最近完成模型", async () => {
   render(
     <MemoryRouter initialEntries={["/tasks/task-failed"]}>
       <App />
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
-    "href",
-    "/tasks/task-failed",
-  );
-  expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
-    "href",
-    "/models/task-failed",
-  );
+  await waitFor(() => {
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
+      "href",
+      "/tasks/task-failed",
+    );
+    expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
+      "href",
+      "/models/task-engine",
+    );
+  });
 });
 
-test("模型路由使用当前任务并标记模型入口", () => {
+test("模型路由使用当前任务并标记模型入口", async () => {
   render(
     <MemoryRouter initialEntries={["/models/task-engine"]}>
       <App />
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
-    "href",
-    "/tasks/task-engine",
-  );
-  expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+  await waitFor(() => {
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
+      "href",
+      "/tasks/task-engine",
+    );
+    expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
 });
 
 test("项目入口定位到最近项目", () => {

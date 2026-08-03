@@ -10,6 +10,11 @@ import { CreateProjectPage } from "./pages/CreateProjectPage";
 import { ModelPreviewPage } from "./pages/ModelPreviewPage";
 import { TaskPage } from "./pages/TaskPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
+import { getRecentProjects } from "./services/projectApi";
+import {
+  resolveNavigationTargets,
+  type NavigationTargets,
+} from "./services/navigationTargets";
 
 type IconName =
   | "grid"
@@ -113,10 +118,32 @@ function ProductLogo() {
 
 export function App() {
   const { pathname, hash } = useLocation();
-  const currentTaskId = pathname.match(/^\/(?:tasks|models)\/([^/]+)$/)?.[1];
   const [openPanel, setOpenPanel] = useState<"help" | "notifications" | null>(
     null,
   );
+  const [navigationTargets, setNavigationTargets] = useState<NavigationTargets>(
+    () => resolveNavigationTargets([], pathname),
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    getRecentProjects()
+      .then((projects) => {
+        if (active) {
+          setNavigationTargets(resolveNavigationTargets(projects, pathname));
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setNavigationTargets(resolveNavigationTargets([], pathname));
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (!hash) {
@@ -133,7 +160,7 @@ export function App() {
       <header className="topbar">
         <Link className="product-link" to="/">
           <ProductLogo />
-          <h1>粒子空间</h1>
+          <h1>Particle Space 2.0</h1>
         </Link>
         <span className="workspace-label">项目工作台</span>
         <div className="topbar-status">
@@ -174,24 +201,13 @@ export function App() {
         <div className="side-rail-main">
           {navItems.map((item) => {
             const destination = item.contextualRoute
-              ? currentTaskId && `/${item.contextualRoute}/${currentTaskId}`
+              ? item.contextualRoute === "tasks"
+                ? `/tasks/${navigationTargets.taskId}`
+                : `/models/${navigationTargets.modelTaskId}`
               : item.to;
 
             if (!destination) {
-              const unavailableLabel = `${item.label}：请先选择项目`;
-              return (
-                <button
-                  className="rail-link rail-link-disabled"
-                  key={item.label}
-                  type="button"
-                  aria-label={unavailableLabel}
-                  title={unavailableLabel}
-                  disabled
-                >
-                  <AppIcon icon={item.icon} />
-                  <small>{item.label}</small>
-                </button>
-              );
+              return null;
             }
 
             return (
