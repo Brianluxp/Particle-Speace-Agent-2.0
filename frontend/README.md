@@ -18,8 +18,7 @@ pnpm build
 
 ## 演示 GLB 地址
 
-`VITE_DEMO_GLB_URL` 用于给 mock 完成任务提供开发演示用的 GLB 地址。
-未配置时，完成任务的 `modelUrl` 为 `null`，页面显示“模型文件暂不可用”。
+`VITE_DEMO_GLB_URL` 用于覆盖 Mock 任务完成后的演示模型地址。未配置时，Mock completed 任务使用仓库内置的 `/models/default.glb`。内置模型仅用于前端 1.0 演示，不代表真实三维生成服务已经接入。
 
 示例：
 
