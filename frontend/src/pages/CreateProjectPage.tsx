@@ -115,8 +115,10 @@ export function CreateProjectPage() {
           </label>
           <input
             id="project-name"
+            name="projectName"
             className="text-field"
             type="text"
+            autoComplete="off"
             value={name}
             placeholder="例如：阀门执行器"
             onChange={(event) => setName(event.target.value)}
@@ -127,6 +129,7 @@ export function CreateProjectPage() {
           </label>
           <select
             id="input-type"
+            name="inputType"
             className="select-field"
             value={inputType}
             onChange={(event) => {
@@ -148,6 +151,7 @@ export function CreateProjectPage() {
             <input
               key={inputType}
               id="project-file"
+              name="projectFile"
               type="file"
               accept={selectedOption.accept}
               aria-describedby="file-formats file-validation"
@@ -161,11 +165,17 @@ export function CreateProjectPage() {
           </div>
 
           {!file ? (
-            <p className="field-message" id="file-validation">
+            <p
+              className="field-message"
+              id="file-validation"
+              aria-live="polite"
+            >
               请选择要上传的文件
             </p>
           ) : null}
-          {submitError ? <p className="form-error">{submitError}</p> : null}
+          {submitError ? (
+            <p className="form-error" role="alert">{submitError}</p>
+          ) : null}
 
           <button
             className="submit-project"

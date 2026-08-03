@@ -59,8 +59,32 @@ describe("CreateProjectPage", () => {
   test("blocks submission until a file is selected", () => {
     renderCreatePage();
 
-    expect(screen.getByText("请选择要上传的文件")).toBeInTheDocument();
+    expect(screen.getByText("请选择要上传的文件")).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
     expect(screen.getByRole("button", { name: "创建并开始生成" })).toBeDisabled();
+  });
+
+  test("provides stable form names and autocomplete behavior", () => {
+    renderCreatePage();
+
+    expect(screen.getByLabelText("项目名称")).toHaveAttribute(
+      "name",
+      "projectName",
+    );
+    expect(screen.getByLabelText("项目名称")).toHaveAttribute(
+      "autocomplete",
+      "off",
+    );
+    expect(screen.getByLabelText("输入类型")).toHaveAttribute(
+      "name",
+      "inputType",
+    );
+    expect(screen.getByLabelText("选择文件")).toHaveAttribute(
+      "name",
+      "projectFile",
+    );
   });
 
   test("creates a project and opens its task", async () => {

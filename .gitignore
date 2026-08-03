@@ -2,5 +2,6 @@ frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 frontend/*.tsbuildinfo
+frontend/.env.local
 prds/
 .DS_Store

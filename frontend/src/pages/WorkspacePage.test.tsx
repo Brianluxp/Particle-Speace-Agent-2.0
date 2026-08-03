@@ -34,6 +34,9 @@ describe("WorkspacePage", () => {
     expect(
       screen.getByRole("heading", { name: "把图纸和图片，变成可运行的3D" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/任务提交、三维生成、模型预览与文件下载/),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "创建新项目" })).toHaveAttribute("href", "/projects/new");
   });
 
@@ -80,9 +83,17 @@ describe("WorkspacePage", () => {
     expect(await screen.findByText("阀门执行器")).toBeInTheDocument();
     expect(screen.getByText("四冲程发动机")).toBeInTheDocument();
     expect(screen.getByText("BMX车架")).toBeInTheDocument();
-    expect(screen.getByText("动态效果生成中")).toBeInTheDocument();
+    expect(screen.getByText("3D模型生成中")).toBeInTheDocument();
     expect(screen.getByText("3D模型已生成")).toBeInTheDocument();
-    expect(screen.getByText("等待参数确认")).toBeInTheDocument();
+    expect(screen.getByText("任务排队中")).toBeInTheDocument();
     expect(container.querySelectorAll("time")).toHaveLength(3);
+  });
+
+  test("does not expose an inactive all-projects action", () => {
+    renderWorkspace();
+
+    expect(
+      screen.queryByRole("button", { name: "查看全部" }),
+    ).not.toBeInTheDocument();
   });
 });

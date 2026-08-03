@@ -11,7 +11,26 @@ import { ModelPreviewPage } from "./pages/ModelPreviewPage";
 import { TaskPage } from "./pages/TaskPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
 
-const navItems = [
+type IconName =
+  | "grid"
+  | "upload"
+  | "tool"
+  | "cube"
+  | "folder"
+  | "bell"
+  | "history"
+  | "help"
+  | "user";
+
+interface NavItem {
+  label: string;
+  icon: IconName;
+  to?: string;
+  contextualRoute?: "tasks" | "models";
+  matches: (path: string, hash: string) => boolean;
+}
+
+const navItems: NavItem[] = [
   {
     label: "工作台",
     to: "/",
@@ -26,13 +45,13 @@ const navItems = [
   },
   {
     label: "任务",
-    to: "/tasks/task-failed",
+    contextualRoute: "tasks",
     icon: "tool",
     matches: (path: string) => path.startsWith("/tasks/"),
   },
   {
     label: "模型",
-    to: "/models/task-engine",
+    contextualRoute: "models",
     icon: "cube",
     matches: (path: string) => path.startsWith("/models/"),
   },
@@ -42,14 +61,7 @@ const navItems = [
     icon: "folder",
     matches: (_path: string, hash: string) => hash === "#recent-projects",
   },
-] as const;
-
-type IconName =
-  | (typeof navItems)[number]["icon"]
-  | "bell"
-  | "history"
-  | "help"
-  | "user";
+];
 
 const iconPaths: Record<IconName, string[]> = {
   grid: [
@@ -101,6 +113,7 @@ function ProductLogo() {
 
 export function App() {
   const { pathname, hash } = useLocation();
+  const currentTaskId = pathname.match(/^\/(?:tasks|models)\/([^/]+)$/)?.[1];
   const [openPanel, setOpenPanel] = useState<"help" | "notifications" | null>(
     null,
   );
@@ -124,7 +137,6 @@ export function App() {
         </Link>
         <span className="workspace-label">项目工作台</span>
         <div className="topbar-status">
-          <span className="saved-status">✓ 已保存</span>
           <button
             className="icon-button"
             type="button"
@@ -160,17 +172,40 @@ export function App() {
 
       <nav className="side-rail" aria-label="主导航">
         <div className="side-rail-main">
-          {navItems.map((item) => (
-            <Link
-              className="rail-link"
-              key={item.label}
-              to={item.to}
-              aria-current={item.matches(pathname, hash) ? "page" : undefined}
-            >
-              <AppIcon icon={item.icon} />
-              <small>{item.label}</small>
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const destination = item.contextualRoute
+              ? currentTaskId && `/${item.contextualRoute}/${currentTaskId}`
+              : item.to;
+
+            if (!destination) {
+              const unavailableLabel = `${item.label}：请先选择项目`;
+              return (
+                <button
+                  className="rail-link rail-link-disabled"
+                  key={item.label}
+                  type="button"
+                  aria-label={unavailableLabel}
+                  title={unavailableLabel}
+                  disabled
+                >
+                  <AppIcon icon={item.icon} />
+                  <small>{item.label}</small>
+                </button>
+              );
+            }
+
+            return (
+              <Link
+                className="rail-link"
+                key={item.label}
+                to={destination}
+                aria-current={item.matches(pathname, hash) ? "page" : undefined}
+              >
+                <AppIcon icon={item.icon} />
+                <small>{item.label}</small>
+              </Link>
+            );
+          })}
         </div>
         <div className="side-rail-footer">
           <button

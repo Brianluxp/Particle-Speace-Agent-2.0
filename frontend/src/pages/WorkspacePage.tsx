@@ -37,9 +37,9 @@ const statusPresentation: Record<
   TaskStatus,
   { label: string; progress: number }
 > = {
-  queued: { label: "等待参数确认", progress: 42 },
+  queued: { label: "任务排队中", progress: 42 },
   parsing: { label: "结构解析中", progress: 56 },
-  generating: { label: "动态效果生成中", progress: 68 },
+  generating: { label: "3D模型生成中", progress: 68 },
   completed: { label: "3D模型已生成", progress: 100 },
   failed: { label: "生成失败", progress: 0 },
 };
@@ -121,7 +121,7 @@ export function WorkspacePage() {
           <p className="eyebrow">✦ Agent 3D 制作工作台</p>
           <h2>把图纸和图片，变成可运行的3D</h2>
           <p>
-            导入CAD图纸、产品图片或现有模型，Agent将引导完成解析、建模、动态效果与网页发布。
+            导入CAD图纸、产品图片或现有模型，Agent将引导完成任务提交、三维生成、模型预览与文件下载。
           </p>
         </div>
         <Link className="primary-action" to="/projects/new">
@@ -166,6 +166,8 @@ export function WorkspacePage() {
           <img
             src="/valve-actuator-viewport.png"
             alt="阀门执行器三维模型"
+            width="1672"
+            height="941"
           />
           <span className="visual-tag visual-tag-structure">AI结构识别</span>
           <span className="visual-tag visual-tag-motion">运动关系</span>
@@ -182,9 +184,6 @@ export function WorkspacePage() {
             <h2 id="recent-heading">最近项目</h2>
             <p>继续上次的制作细节</p>
           </div>
-          <button type="button">
-            查看全部 <span aria-hidden="true">→</span>
-          </button>
         </div>
 
         <div className="project-list">

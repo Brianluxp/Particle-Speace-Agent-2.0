@@ -24,8 +24,10 @@ pnpm build
 示例：
 
 ```dotenv
-VITE_DEMO_GLB_URL=https://example.com/demo.glb
+VITE_DEMO_GLB_URL=https://modelviewer.dev/shared-assets/models/Astronaut.glb
 ```
+
+仓库中的 `.env.example` 提供相同示例。复制为 `.env.local` 后重启开发服务器即可生效；`.env.local` 只用于本机并已被 Git 忽略。
 
 ## 替换真实后端时保持的接口
 
