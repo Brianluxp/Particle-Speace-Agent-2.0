@@ -1,6 +1,8 @@
 import type { GenerationTask, Project } from "../types/task";
 
 export const FAILED_TASK_ID = "task-failed";
+export const DEFAULT_MODEL_TASK_ID = "task-default-model";
+export const DEFAULT_MODEL_URL = "/models/default.glb";
 
 export const recentProjects: Project[] = [
   {
@@ -63,7 +65,7 @@ export const initialTasks: GenerationTask[] = [
     stageLabel: "3D\u6A21\u578B\u5DF2\u751F\u6210",
     createdAt: "2026-07-28T10:20:00.000Z",
     errorMessage: null,
-    modelUrl: import.meta.env.VITE_DEMO_GLB_URL ?? null,
+    modelUrl: import.meta.env.VITE_DEMO_GLB_URL ?? DEFAULT_MODEL_URL,
     thumbnailUrl: null,
   },
   {
@@ -76,6 +78,18 @@ export const initialTasks: GenerationTask[] = [
     createdAt: "2026-07-26T09:30:00.000Z",
     errorMessage: null,
     modelUrl: null,
+    thumbnailUrl: null,
+  },
+  {
+    id: DEFAULT_MODEL_TASK_ID,
+    projectId: "project-default-model",
+    inputType: "model",
+    status: "completed",
+    progress: 100,
+    stageLabel: "\u9ED8\u8BA4\u6A21\u578B\u5DF2\u5C31\u7EEA",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    errorMessage: null,
+    modelUrl: DEFAULT_MODEL_URL,
     thumbnailUrl: null,
   },
 ];

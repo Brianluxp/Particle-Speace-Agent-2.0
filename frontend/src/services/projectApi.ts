@@ -3,15 +3,20 @@ import type {
   GenerationTask,
   Project,
 } from "../types/task";
-import { initialTasks, recentProjects } from "../mocks/projects";
+import {
+  DEFAULT_MODEL_URL,
+  initialTasks,
+  recentProjects,
+} from "../mocks/projects";
 
 const tasks = new Map(
   initialTasks.map((task) => [task.id, structuredClone(task)]),
 );
+const projects = structuredClone(recentProjects);
 
 let nextTaskId = 1;
 
-const demoModelUrl = import.meta.env.VITE_DEMO_GLB_URL ?? null;
+const demoModelUrl = import.meta.env.VITE_DEMO_GLB_URL ?? DEFAULT_MODEL_URL;
 
 function cloneTask(task: GenerationTask): GenerationTask {
   return structuredClone(task);
@@ -35,6 +40,14 @@ export async function createProject(
   };
 
   tasks.set(task.id, task);
+  projects.unshift({
+    id: task.projectId,
+    name: input.name,
+    inputType: input.inputType,
+    taskId: task.id,
+    status: task.status,
+    createdAt: task.createdAt,
+  });
   return cloneTask(task);
 }
 
@@ -62,6 +75,7 @@ export async function getTask(taskId: string): Promise<GenerationTask> {
     });
   }
 
+  syncProjectStatus(task);
   return cloneTask(task);
 }
 
@@ -77,11 +91,22 @@ export async function retryTask(taskId: string): Promise<GenerationTask> {
     thumbnailUrl: null,
   });
 
+  syncProjectStatus(task);
   return cloneTask(task);
 }
 
 export async function getRecentProjects(): Promise<Project[]> {
-  return structuredClone(recentProjects);
+  return structuredClone(projects).sort(
+    (left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt),
+  );
+}
+
+function syncProjectStatus(task: GenerationTask): void {
+  const project = projects.find((item) => item.taskId === task.id);
+
+  if (project) {
+    project.status = task.status;
+  }
 }
 
 function requireTask(taskId: string): GenerationTask {
