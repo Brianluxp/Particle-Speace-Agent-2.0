@@ -74,9 +74,9 @@ test("首页任务和模型入口打开最近目标", async () => {
   );
 
   await waitFor(() => {
-    expect(screen.getByRole("link", { name: "AI制作" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
       "href",
-      "/editor/task-valve",
+      "/tasks/task-valve",
     );
     expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
       "href",
@@ -95,9 +95,9 @@ test("没有最近项目时使用默认模型任务", async () => {
   );
 
   await waitFor(() => {
-    expect(screen.getByRole("link", { name: "AI制作" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
       "href",
-      `/editor/${DEFAULT_MODEL_TASK_ID}`,
+      `/tasks/${DEFAULT_MODEL_TASK_ID}`,
     );
     expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
       "href",
@@ -114,9 +114,9 @@ test("任务路由保留当前任务并指向最近完成模型", async () => {
   );
 
   await waitFor(() => {
-    expect(screen.getByRole("link", { name: "AI制作" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
       "href",
-      "/editor/task-failed",
+      "/tasks/task-failed",
     );
     expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
       "href",
@@ -133,9 +133,9 @@ test("模型路由使用当前任务并标记模型入口", async () => {
   );
 
   await waitFor(() => {
-    expect(screen.getByRole("link", { name: "AI制作" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "任务" })).toHaveAttribute(
       "href",
-      "/editor/task-engine",
+      "/tasks/task-engine",
     );
     expect(screen.getByRole("link", { name: "模型" })).toHaveAttribute(
       "aria-current",
@@ -226,21 +226,6 @@ test("未开放的历史版本和账号入口不可操作", () => {
 
   expect(screen.getByRole("button", { name: "历史版本暂未开放" })).toBeDisabled();
   expect(screen.getByRole("button", { name: "账号功能暂未开放" })).toBeDisabled();
-});
-
-test("wrench navigation opens the latest task editor", async () => {
-  render(
-    <MemoryRouter>
-      <App />
-    </MemoryRouter>,
-  );
-
-  await waitFor(() => {
-    expect(screen.getByRole("link", { name: "AI制作" })).toHaveAttribute(
-      "href",
-      "/editor/task-valve",
-    );
-  });
 });
 
 test("editor route does not render the standard application shell", () => {

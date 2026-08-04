@@ -32,7 +32,7 @@ interface NavItem {
   label: string;
   icon: IconName;
   to?: string;
-  contextualRoute?: "tasks" | "editors" | "models";
+  contextualRoute?: "tasks" | "models";
   matches: (path: string, hash: string) => boolean;
 }
 
@@ -50,10 +50,10 @@ const navItems: NavItem[] = [
     matches: (path: string) => path.startsWith("/projects/new"),
   },
   {
-    label: "AI制作",
-    contextualRoute: "editors",
+    label: "任务",
+    contextualRoute: "tasks",
     icon: "tool",
-    matches: (path: string) => path.startsWith("/editor/"),
+    matches: (path: string) => path.startsWith("/tasks/"),
   },
   {
     label: "模型",
@@ -215,9 +215,7 @@ export function App() {
             const destination = item.contextualRoute
               ? item.contextualRoute === "tasks"
                 ? `/tasks/${navigationTargets.taskId}`
-                : item.contextualRoute === "editors"
-                  ? `/editor/${navigationTargets.editorTaskId}`
-                  : `/models/${navigationTargets.modelTaskId}`
+                : `/models/${navigationTargets.modelTaskId}`
               : item.to;
 
             if (!destination) {
