@@ -254,4 +254,15 @@ describe("Editor Shell Controls", () => {
     fireEvent.click(screen.getByRole("button", { name: "图片" }));
     expect(screen.getByText("1.0 暂未接入")).toBeInTheDocument();
   });
+
+  test("renders the five-region desktop editor layout", async () => {
+    const { container } = renderCompletedValveEditor();
+    await screen.findByText("Agent 引导");
+
+    expect(container.querySelector(".editor-topbar")).toBeInTheDocument();
+    expect(container.querySelector(".editor-rail")).toBeInTheDocument();
+    expect(container.querySelector(".editor-guide")).toBeInTheDocument();
+    expect(container.querySelector(".editor-main")).toBeInTheDocument();
+    expect(container.querySelector(".editor-inspector")).toBeInTheDocument();
+  });
 });

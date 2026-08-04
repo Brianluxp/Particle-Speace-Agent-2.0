@@ -103,6 +103,16 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
 
   return (
     <div className="editor-shell">
+      <div className="editor-desktop-notice">
+        建议使用 1280px 以上桌面端查看完整编辑器
+      </div>
+      <div className="editor-mobile-blocker">
+        <h2>请使用桌面端打开编辑器</h2>
+        <p>
+          编辑器包含 3D 视口、动画时间轴与结构树，为了提供最佳的交互体验，请在桌面端浏览器中打开使用。
+        </p>
+      </div>
+
       <header className="editor-topbar">
         <div className="topbar-left">
           <span className="brand-logo">PARTICLE SPACE</span>
