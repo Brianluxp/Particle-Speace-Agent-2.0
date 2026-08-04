@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../App";
+import type { ModelViewerElement } from "../model-viewer";
 import type { GenerationTask, TaskStatus } from "../types/task";
 import { getTask } from "../services/projectApi";
 
@@ -144,5 +145,49 @@ describe("EditorPage Interactions", () => {
     fireEvent.click(screen.getByRole("button", { name: "发送需求" }));
 
     expect(screen.getByText("需求已记录，真实 Agent 服务尚未接入")).toBeInTheDocument();
+  });
+});
+
+describe("EditorViewport Controls", () => {
+  test("uses the task model URL and exposes real viewport controls", async () => {
+    const { container } = renderCompletedValveEditor();
+    const viewer = await waitFor(() => {
+      const el = container.querySelector("model-viewer");
+      expect(el).not.toBeNull();
+      return el!;
+    });
+
+    expect(viewer).toHaveAttribute("src", "/models/valve.glb");
+    expect(viewer).toHaveAttribute("camera-controls");
+    expect(screen.getByRole("button", { name: "重置视角" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "全屏视口" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "导出视口截图" })).toBeEnabled();
+  });
+
+  test("keeps the editor shell visible when the model fails", async () => {
+    const { container } = renderCompletedValveEditor();
+    const viewer = await waitFor(() => {
+      const el = container.querySelector("model-viewer");
+      expect(el).not.toBeNull();
+      return el!;
+    });
+    fireEvent.error(viewer);
+
+    expect(screen.getByText("模型加载失败")).toBeInTheDocument();
+    expect(screen.getByText("Agent 引导")).toBeInTheDocument();
+  });
+
+  test("reports screenshot errors in Chinese", async () => {
+    const { container } = renderCompletedValveEditor();
+    const viewer = await waitFor(() => {
+      const el = container.querySelector("model-viewer") as ModelViewerElement;
+      expect(el).not.toBeNull();
+      return el;
+    });
+    viewer.toBlob = vi.fn().mockRejectedValue(new Error("capture failed"));
+
+    fireEvent.click(screen.getByRole("button", { name: "导出视口截图" }));
+
+    expect(await screen.findByText("当前浏览器无法导出视口截图")).toBeInTheDocument();
   });
 });

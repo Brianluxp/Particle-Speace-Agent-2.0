@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { AgentGuidePanel } from "../components/editor/AgentGuidePanel";
+import { EditorViewport } from "../components/editor/EditorViewport";
 import { SceneInspector } from "../components/editor/SceneInspector";
 import { getEditorDefinition } from "../mocks/editorMockData";
 import { loadEditorDraft, saveEditorDraft } from "../services/editorDraftStore";
@@ -11,8 +12,10 @@ import type { GenerationTask } from "../types/task";
 function LoadedEditor({ task }: { task: GenerationTask }) {
   const definition = useMemo(() => getEditorDefinition(task.id), [task.id]);
   const [draft, setDraft] = useState(() => loadEditorDraft(task.id, definition));
-  const [saveMessage, setSaveMessage] = useState<string | null>("演示草稿已保存");
+  const [saveMessage] = useState<string | null>("演示草稿已保存");
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
+  const [isTimelinePlaying] = useState(false);
+  const [, setHasEmbeddedAnimation] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -29,7 +32,6 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
       saveEditorDraft(task.id, next);
       return next;
     });
-    setSaveMessage("演示草稿已保存");
   }
 
   const handleAxisChange = (axis: RotationAxis) => {
@@ -129,9 +131,12 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
       />
 
       <main className="editor-main">
-        <div className="viewport-container">
-          <model-viewer src={task.modelUrl!} camera-controls alt="3D 模型" />
-        </div>
+        <EditorViewport
+          modelUrl={task.modelUrl!}
+          isTimelinePlaying={isTimelinePlaying}
+          onAnimationAvailability={setHasEmbeddedAnimation}
+          onNotice={setNoticeMessage}
+        />
       </main>
 
       <SceneInspector
