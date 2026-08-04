@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { AgentGuidePanel } from "../components/editor/AgentGuidePanel";
+import { AnimationTimeline } from "../components/editor/AnimationTimeline";
 import { EditorViewport } from "../components/editor/EditorViewport";
 import { SceneInspector } from "../components/editor/SceneInspector";
 import { getEditorDefinition } from "../mocks/editorMockData";
@@ -14,8 +15,8 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
   const [draft, setDraft] = useState(() => loadEditorDraft(task.id, definition));
   const [saveMessage] = useState<string | null>("演示草稿已保存");
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
-  const [isTimelinePlaying] = useState(false);
-  const [, setHasEmbeddedAnimation] = useState(false);
+  const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
+  const [hasEmbeddedAnimation, setHasEmbeddedAnimation] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -136,6 +137,15 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
           isTimelinePlaying={isTimelinePlaying}
           onAnimationAvailability={setHasEmbeddedAnimation}
           onNotice={setNoticeMessage}
+        />
+        <AnimationTimeline
+          tracks={definition.tracks}
+          seconds={draft.timelineSeconds}
+          hasEmbeddedAnimation={hasEmbeddedAnimation}
+          onSecondsChange={(secs) =>
+            updateDraft((current) => ({ ...current, timelineSeconds: secs }))
+          }
+          onPlayingChange={setIsTimelinePlaying}
         />
       </main>
 

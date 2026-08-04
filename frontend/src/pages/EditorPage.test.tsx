@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../App";
@@ -64,6 +64,7 @@ export function renderCompletedGenericEditor() {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   vi.clearAllMocks();
   localStorage.clear();
 });
@@ -189,5 +190,43 @@ describe("EditorViewport Controls", () => {
     fireEvent.click(screen.getByRole("button", { name: "导出视口截图" }));
 
     expect(await screen.findByText("当前浏览器无法导出视口截图")).toBeInTheDocument();
+  });
+});
+
+describe("AnimationTimeline", () => {
+  test("plays, pauses, and stops the demo timeline at ten seconds", async () => {
+    renderCompletedValveEditor();
+    await screen.findByText("动画轨道演示，不会修改模型文件");
+
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole("button", { name: "播放时间轴" }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2_000);
+    });
+    expect(screen.getByTestId("timeline-time")).toHaveTextContent("00:02");
+
+    fireEvent.click(screen.getByRole("button", { name: "暂停时间轴" }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1_000);
+    });
+    expect(screen.getByTestId("timeline-time")).toHaveTextContent("00:02");
+
+    fireEvent.click(screen.getByRole("button", { name: "播放时间轴" }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(screen.getByTestId("timeline-time")).toHaveTextContent("00:10");
+    expect(screen.getByRole("button", { name: "播放时间轴" })).toBeEnabled();
+    vi.useRealTimers();
+  });
+
+  test("scrubs and resets the timeline", async () => {
+    renderCompletedValveEditor();
+    const range = await screen.findByLabelText("时间轴位置");
+
+    fireEvent.change(range, { target: { value: "6" } });
+    expect(screen.getByTestId("timeline-time")).toHaveTextContent("00:06");
+    fireEvent.click(screen.getByRole("button", { name: "复位时间轴" }));
+    expect(screen.getByTestId("timeline-time")).toHaveTextContent("00:00");
   });
 });
