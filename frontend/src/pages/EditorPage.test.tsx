@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../App";
@@ -104,5 +104,45 @@ describe("EditorPage Gate", () => {
     renderEditor();
 
     expect(await screen.findByText("无法读取编辑器任务")).toBeInTheDocument();
+  });
+});
+
+describe("EditorPage Interactions", () => {
+  test("selects a valve node and shows its properties", async () => {
+    renderCompletedValveEditor();
+
+    fireEvent.click(await screen.findByRole("button", { name: "选择阀杆" }));
+
+    expect(screen.getByRole("heading", { name: "阀杆" })).toBeInTheDocument();
+    expect(screen.getByDisplayValue("115.20")).toHaveAttribute("readonly");
+  });
+
+  test("stores the selected rotation axis and advances the demo step", async () => {
+    renderCompletedValveEditor();
+
+    fireEvent.click(await screen.findByLabelText("方向 B"));
+    fireEvent.click(screen.getByRole("button", { name: "继续生成动态效果" }));
+
+    expect(screen.getByText("检查与优化")).toHaveAttribute("data-state", "active");
+    expect(screen.getByText("演示草稿已保存")).toBeInTheDocument();
+    expect(screen.getByText("仅保存在当前浏览器，未写入模型文件")).toBeInTheDocument();
+  });
+
+  test("does not show valve parts for a generic task", async () => {
+    renderCompletedGenericEditor();
+
+    expect(await screen.findByText("当前模型暂无部件级结构数据")).toBeInTheDocument();
+    expect(screen.queryByText("阀杆")).not.toBeInTheDocument();
+  });
+
+  test("records an agent demo message without claiming model changes", async () => {
+    renderCompletedValveEditor();
+
+    fireEvent.change(await screen.findByLabelText("告诉 Agent 你的想法或需求"), {
+      target: { value: "让阀杆旋转更慢" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "发送需求" }));
+
+    expect(screen.getByText("需求已记录，真实 Agent 服务尚未接入")).toBeInTheDocument();
   });
 });

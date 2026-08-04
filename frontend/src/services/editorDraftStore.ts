@@ -5,13 +5,19 @@ const KEY_PREFIX = "particle-space:editor-draft:";
 export function createDefaultEditorDraft(
   definition: EditorDefinition,
 ): EditorDraft {
+  const parentNodeIds = new Set(
+    definition.nodes
+      .filter((node) => definition.nodes.some((child) => child.parentId === node.id))
+      .map((node) => node.id),
+  );
+
   return {
     version: 1,
     activeStepId: "motion",
     rotationAxis: "axis-a",
     selectedNodeId: definition.nodes[0].id,
     expandedNodeIds: definition.nodes
-      .filter((node) => node.parentId === null)
+      .filter((node) => node.parentId === null || parentNodeIds.has(node.id))
       .map((node) => node.id),
     hiddenNodeIds: [],
     lockedNodeIds: [],
