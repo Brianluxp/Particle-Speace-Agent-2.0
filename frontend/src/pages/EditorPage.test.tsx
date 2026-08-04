@@ -230,3 +230,28 @@ describe("AnimationTimeline", () => {
     expect(screen.getByTestId("timeline-time")).toHaveTextContent("00:00");
   });
 });
+
+describe("Editor Shell Controls", () => {
+  test("links preview and task navigation to the current task", async () => {
+    renderCompletedValveEditor();
+
+    expect(await screen.findByRole("link", { name: "预览" })).toHaveAttribute(
+      "href",
+      "/models/task-valve",
+    );
+    expect(screen.getByRole("link", { name: "返回任务" })).toHaveAttribute(
+      "href",
+      "/tasks/task-valve",
+    );
+  });
+
+  test("does not fake publishing or unavailable tools", async () => {
+    renderCompletedValveEditor();
+
+    fireEvent.click(await screen.findByRole("button", { name: "发布" }));
+    expect(screen.getByText("真实发布服务尚未接入")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "图片" }));
+    expect(screen.getByText("1.0 暂未接入")).toBeInTheDocument();
+  });
+});

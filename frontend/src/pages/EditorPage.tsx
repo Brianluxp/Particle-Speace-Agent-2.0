@@ -17,6 +17,7 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
   const [hasEmbeddedAnimation, setHasEmbeddedAnimation] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -108,6 +109,7 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
           <h1>{definition.projectName}</h1>
           <span className="source-tag">{definition.sourceLabel}</span>
         </div>
+
         <div className="topbar-status-area" role="status">
           {saveMessage ? (
             <div className="save-status">
@@ -117,9 +119,87 @@ function LoadedEditor({ task }: { task: GenerationTask }) {
           ) : null}
           {noticeMessage ? <div className="notice-banner">{noticeMessage}</div> : null}
         </div>
+
+        <div className="topbar-right-actions">
+          <Link className="topbar-link" to={`/tasks/${task.id}`}>
+            返回任务
+          </Link>
+          <Link className="topbar-link preview-link" to={`/models/${task.id}`}>
+            预览
+          </Link>
+          <button
+            type="button"
+            className="topbar-btn publish-btn"
+            onClick={() => setNoticeMessage("真实发布服务尚未接入")}
+          >
+            发布
+          </button>
+        </div>
       </header>
+
       <nav className="editor-rail" aria-label="编辑器导航">
-        <span />
+        <div className="rail-main-links">
+          <Link className="editor-rail-item" to="/" title="工作台">
+            <span className="rail-icon">⊞</span>
+            <small>工作台</small>
+          </Link>
+          <Link className="editor-rail-item" to="/projects/new" title="导入">
+            <span className="rail-icon">⇪</span>
+            <small>导入</small>
+          </Link>
+          <Link
+            className="editor-rail-item active"
+            to={`/editor/${task.id}`}
+            title="AI制作"
+            aria-current="page"
+          >
+            <span className="rail-icon">🛠</span>
+            <small>AI制作</small>
+          </Link>
+          <Link
+            className="editor-rail-item"
+            to={`/models/${task.id}`}
+            title="模型"
+          >
+            <span className="rail-icon">🧊</span>
+            <small>模型</small>
+          </Link>
+          <Link className="editor-rail-item" to="/#recent-projects" title="项目">
+            <span className="rail-icon">📁</span>
+            <small>项目</small>
+          </Link>
+        </div>
+
+        <div className="rail-footer-links">
+          <button
+            type="button"
+            className="editor-rail-item"
+            aria-label="历史版本暂未开放"
+            title="历史版本暂未开放"
+            disabled
+          >
+            <span className="rail-icon">🕒</span>
+          </button>
+          <button
+            type="button"
+            className="editor-rail-item"
+            aria-label="帮助"
+            title="帮助"
+            aria-expanded={showHelp}
+            onClick={() => setShowHelp(!showHelp)}
+          >
+            <span className="rail-icon">?</span>
+          </button>
+        </div>
+
+        {showHelp ? (
+          <section className="editor-help-popover" role="dialog" aria-label="帮助">
+            <h4>编辑器演示说明</h4>
+            <p>1. 中央为真实 GLB 模型视口，支持全屏与视口截图。</p>
+            <p>2. 对象大纲树、属性面板与 Agent 引导面板均为浏览器演示操作。</p>
+            <p>3. 任何编辑草稿仅在本地保存，未写回 GLB 模型文件。</p>
+          </section>
+        ) : null}
       </nav>
 
       <AgentGuidePanel
