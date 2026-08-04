@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { CreateProjectPage } from "./pages/CreateProjectPage";
+import { EditorPage } from "./pages/EditorPage";
 import { ModelPreviewPage } from "./pages/ModelPreviewPage";
 import { TaskPage } from "./pages/TaskPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
@@ -31,7 +32,7 @@ interface NavItem {
   label: string;
   icon: IconName;
   to?: string;
-  contextualRoute?: "tasks" | "models";
+  contextualRoute?: "tasks" | "editors" | "models";
   matches: (path: string, hash: string) => boolean;
 }
 
@@ -49,10 +50,10 @@ const navItems: NavItem[] = [
     matches: (path: string) => path.startsWith("/projects/new"),
   },
   {
-    label: "任务",
-    contextualRoute: "tasks",
+    label: "AI制作",
+    contextualRoute: "editors",
     icon: "tool",
-    matches: (path: string) => path.startsWith("/tasks/"),
+    matches: (path: string) => path.startsWith("/editor/"),
   },
   {
     label: "模型",
@@ -92,7 +93,7 @@ const iconPaths: Record<IconName, string[]> = {
     "M12 3.25a8.75 8.75 0 1 1-8.24 5.8.75.75 0 1 1 1.41.5A7.25 7.25 0 1 0 12 4.75H7.81l1.47 1.47a.75.75 0 0 1-1.06 1.06L5.47 4.53a.75.75 0 0 1 0-1.06L8.22.72a.75.75 0 0 1 1.06 1.06L7.81 3.25Zm0 3.5a.75.75 0 0 1 .75.75v4.19l2.78 1.6a.75.75 0 1 1-.75 1.3l-3.16-1.83a.75.75 0 0 1-.37-.65V7.5a.75.75 0 0 1 .75-.75Z",
   ],
   help: [
-    "M12 1.25A10.75 10.75 0 1 0 22.75 12 10.76 10.76 0 0 0 12 1.25Zm0 19.5A8.75 8.75 0 1 1 20.75 12 8.76 8.76 0 0 1 12 20.75Zm0-4.5a1.13 1.13 0 1 0 0 2.25 1.13 1.13 0 0 0 0-2.25Zm.13-10.5a4 4 0 0 0-3.86 3 .75.75 0 0 0 1.45.39 2.5 2.5 0 1 1 3.03 3.08 2 2 0 0 0-1.5 1.94v.34a.75.75 0 0 0 1.5 0v-.34a.5.5 0 0 1 .38-.49 4 4 0 0 0-1-7.92Z",
+    "M12 1.25A10.75 10.75 0 1 0 22.75 12 10.76 10.76 0 0 0 12 1.25Zm0 19.5A8.75 8.75 0 1 1 20.75 12 8.76 8.76 0 0 0 12 20.75Zm0-4.5a1.13 1.13 0 1 0 0 2.25 1.13 1.13 0 0 0 0-2.25Zm.13-10.5a4 4 0 0 0-3.86 3 .75.75 0 0 0 1.45.39 2.5 2.5 0 1 1 3.03 3.08 2 2 0 0 0-1.5 1.94v.34a.75.75 0 0 0 1.5 0v-.34a.5.5 0 0 1 .38-.49 4 4 0 0 0-1-7.92Z",
   ],
   user: [
     "M12 1.25A10.75 10.75 0 1 0 22.75 12 10.76 10.76 0 0 0 12 1.25Zm0 4a3.75 3.75 0 1 1-3.75 3.75A3.75 3.75 0 0 1 12 5.25Zm0 15.5a8.7 8.7 0 0 1-6.56-2.97 7.76 7.76 0 0 1 13.12 0A8.7 8.7 0 0 1 12 20.75Z",
@@ -155,6 +156,17 @@ export function App() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [hash, pathname]);
 
+  const isEditorRoute = /^\/editor\/[^/]+$/.test(pathname);
+
+  if (isEditorRoute) {
+    return (
+      <Routes>
+        <Route path="/editor/:taskId" element={<EditorPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -203,7 +215,9 @@ export function App() {
             const destination = item.contextualRoute
               ? item.contextualRoute === "tasks"
                 ? `/tasks/${navigationTargets.taskId}`
-                : `/models/${navigationTargets.modelTaskId}`
+                : item.contextualRoute === "editors"
+                  ? `/editor/${navigationTargets.editorTaskId}`
+                  : `/models/${navigationTargets.modelTaskId}`
               : item.to;
 
             if (!destination) {

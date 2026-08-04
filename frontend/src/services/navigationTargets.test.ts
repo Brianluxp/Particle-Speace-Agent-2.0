@@ -28,6 +28,7 @@ describe("resolveNavigationTargets", () => {
   test("selects the newest task and newest completed model", () => {
     expect(resolveNavigationTargets(projects, "/")).toEqual({
       taskId: "task-newest",
+      editorTaskId: "task-newest",
       modelTaskId: "task-completed-newest",
     });
   });
@@ -35,6 +36,7 @@ describe("resolveNavigationTargets", () => {
   test("keeps the current task while using the newest completed model", () => {
     expect(resolveNavigationTargets(projects, "/tasks/task-current")).toEqual({
       taskId: "task-current",
+      editorTaskId: "task-current",
       modelTaskId: "task-completed-newest",
     });
   });
@@ -42,13 +44,23 @@ describe("resolveNavigationTargets", () => {
   test("keeps the current model as both navigation targets", () => {
     expect(resolveNavigationTargets(projects, "/models/task-current-model")).toEqual({
       taskId: "task-current-model",
+      editorTaskId: "task-current-model",
       modelTaskId: "task-current-model",
+    });
+  });
+
+  test("keeps the current editor task as editor and model context", () => {
+    expect(resolveNavigationTargets(projects, "/editor/task-current")).toEqual({
+      taskId: "task-current",
+      editorTaskId: "task-current",
+      modelTaskId: "task-current",
     });
   });
 
   test("uses the default model task when there are no recent projects", () => {
     expect(resolveNavigationTargets([], "/")).toEqual({
       taskId: DEFAULT_MODEL_TASK_ID,
+      editorTaskId: DEFAULT_MODEL_TASK_ID,
       modelTaskId: DEFAULT_MODEL_TASK_ID,
     });
   });
