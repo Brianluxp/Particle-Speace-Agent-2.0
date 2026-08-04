@@ -203,10 +203,14 @@ export function TaskPage() {
           {loadError ? <p className="form-error">{loadError}</p> : null}
 
           {task.status === "completed" ? (
-            <Link className="submit-project task-action" to={`/models/${task.id}`}>
-              查看 3D 模型
-              <span aria-hidden="true">→</span>
-            </Link>
+            <div className="task-completed-actions">
+              <Link className="submit-project task-action" to={`/editor/${task.id}`}>
+                进入编辑器
+              </Link>
+              <Link className="secondary-action" to={`/models/${task.id}`}>
+                查看 3D 模型
+              </Link>
+            </div>
           ) : null}
 
           {task.status === "failed" ? (

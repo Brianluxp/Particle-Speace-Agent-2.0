@@ -118,6 +118,10 @@ describe("TaskPage", () => {
     await act(async () => {
       await vi.advanceTimersByTimeAsync(POLL_INTERVAL);
     });
+    expect(screen.getByRole("link", { name: "进入编辑器" })).toHaveAttribute(
+      "href",
+      "/editor/task-monitor",
+    );
     fireEvent.click(screen.getByRole("link", { name: "查看 3D 模型" }));
 
     expect(screen.getByTestId("location")).toHaveTextContent(
