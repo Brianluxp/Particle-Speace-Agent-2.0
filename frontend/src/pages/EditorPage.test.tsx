@@ -231,6 +231,34 @@ describe("AnimationTimeline", () => {
   });
 });
 
+describe("EditorPage Preview Modal", () => {
+  test("never feeds a GLB URL to the preview <img>", async () => {
+    renderCompletedValveEditor();
+    const previewButton = await screen.findByRole("button", { name: "预览" });
+    fireEvent.click(previewButton);
+
+    const previewImage = await screen.findByAltText("阀门执行器动态效果预览");
+    const src = previewImage.getAttribute("src") ?? "";
+    expect(src).not.toMatch(/\.glb($|\?)/i);
+    expect(src).not.toMatch(/\.gltf($|\?)/i);
+    expect(src.length).toBeGreaterThan(0);
+  });
+
+  test("falls back to the SVG placeholder when thumbnail load fails", async () => {
+    renderCompletedValveEditor();
+    fireEvent.click(await screen.findByRole("button", { name: "预览" }));
+
+    const previewImage = await screen.findByAltText("阀门执行器动态效果预览");
+    fireEvent.error(previewImage);
+
+    await waitFor(() => {
+      expect(previewImage.getAttribute("src")).toBe(
+        "/valve-actuator-viewport.svg",
+      );
+    });
+  });
+});
+
 describe("Editor Shell Controls", () => {
   test("links preview and task navigation to the current task", async () => {
     renderCompletedValveEditor();

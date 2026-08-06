@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import type { ModelViewerElement } from "@google/model-viewer";
 import { getTask } from "../services/projectApi";
+import { DEFAULT_MODEL_URL } from "../mocks/projects";
 import type { GenerationTask } from "../types/task";
+
+const FALLBACK_MODEL_URL = import.meta.env.VITE_DEMO_GLB_URL ?? DEFAULT_MODEL_URL;
 
 export function ModelPreviewPage() {
   const { taskId } = useParams();
@@ -28,22 +31,29 @@ export function ModelPreviewPage() {
     }
 
     let active = true;
+    let timer: number | undefined;
 
-    getTask(taskId)
-      .then((result) => {
-        if (active) {
-          setTask(result);
-          setLoadError(null);
+    const pollTask = async () => {
+      try {
+        const result = await getTask(taskId);
+        if (!active) return;
+        setTask(result);
+        setLoadError(null);
+        if (result.status !== "completed" && result.status !== "failed") {
+          timer = window.setTimeout(pollTask, 800);
         }
-      })
-      .catch(() => {
+      } catch {
         if (active) {
           setLoadError("模型任务加载失败，请返回任务详情后重试");
         }
-      });
+      }
+    };
+
+    pollTask();
 
     return () => {
       active = false;
+      if (timer) window.clearTimeout(timer);
     };
   }, [taskId]);
 
@@ -54,6 +64,20 @@ export function ModelPreviewPage() {
       setLoadError("浏览器无法进入全屏预览");
     }
   }
+
+  const modelUrl = task?.modelUrl ?? FALLBACK_MODEL_URL;
+  const isModelAsset = (url: string) => /\.(glb|gltf)$/i.test(url);
+  const initialThumbnail =
+    task?.thumbnailUrl ??
+    (modelUrl && !isModelAsset(modelUrl) ? modelUrl : null) ??
+    "/valve-actuator-viewport.svg";
+  const [thumbnailUrl, setThumbnailUrl] = useState(initialThumbnail);
+  useEffect(() => {
+    setThumbnailUrl(initialThumbnail);
+  }, [initialThumbnail]);
+  const handleThumbnailError = useCallback(() => {
+    setThumbnailUrl("/valve-actuator-viewport.svg");
+  }, []);
 
   if (!taskId) {
     return <Navigate to="/" replace />;
@@ -81,24 +105,14 @@ export function ModelPreviewPage() {
   }
 
   if (task.status !== "completed") {
-    return <Navigate to={`/tasks/${task.id}`} replace />;
-  }
-
-  if (!task.modelUrl) {
     return (
-      <section className="model-state-card model-empty-state">
-        <span className="state-symbol" aria-hidden="true">
-          ◇
-        </span>
-        <span className="state-code">MODEL FILE / EMPTY</span>
-        <h2>模型文件暂不可用</h2>
-        <p>任务已经完成，但当前没有可供预览和下载的 GLB 文件。</p>
-        <Link className="secondary-action" to={`/tasks/${task.id}`}>
-          返回任务详情
-        </Link>
+      <section className="task-loading" aria-live="polite">
+        模型生成中（{task.progress ?? 0}%）· {task.stageLabel ?? "请稍候"}
       </section>
     );
   }
+
+  const finalModelUrl = task.modelUrl ?? FALLBACK_MODEL_URL;
 
   return (
     <div className="model-preview-page">
@@ -122,7 +136,7 @@ export function ModelPreviewPage() {
               <span aria-hidden="true">⛶</span>
               全屏预览
             </button>
-            <a href={task.modelUrl} download="particle-model.glb">
+            <a href={finalModelUrl} download="particle-model.glb">
               <span aria-hidden="true">↓</span>
               下载模型
             </a>
@@ -138,12 +152,19 @@ export function ModelPreviewPage() {
           <model-viewer
             ref={setViewerRef}
             className={modelFailed ? "model-viewer is-failed" : "model-viewer"}
-            src={task.modelUrl}
+            src={finalModelUrl}
             camera-controls
             auto-rotate
             shadow-intensity="1"
             alt="粒子空间代理生成的 3D 模型"
-          />
+          >
+            <img
+              slot="poster"
+              src={thumbnailUrl}
+              alt="模型预览占位"
+              onError={handleThumbnailError}
+            />
+          </model-viewer>
 
           {modelFailed ? (
             <div className="model-load-error" role="alert">

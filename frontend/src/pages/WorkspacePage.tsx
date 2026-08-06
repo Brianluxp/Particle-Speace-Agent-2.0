@@ -124,8 +124,12 @@ export function WorkspacePage() {
             导入CAD图纸、产品图片或现有模型，Agent将引导完成任务提交、三维生成、模型预览与文件下载。
           </p>
         </div>
-        <Link className="primary-action" to="/projects/new">
-          <span aria-hidden="true">＋</span>
+        <Link
+          className="primary-action"
+          to="/projects/new"
+          style={{ minWidth: "165px", height: "56px", padding: "0 22px", justifyContent: "center", alignItems: "center", display: "inline-flex", borderRadius: "8px", fontSize: "15px", fontWeight: "600", letterSpacing: ".01em" }}
+        >
+          <span aria-hidden="true" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "20px", height: "20px", fontSize: "18px", fontWeight: "500", lineHeight: "1" }}>＋</span>
           创建新项目
         </Link>
       </section>
@@ -184,6 +188,9 @@ export function WorkspacePage() {
             <h2 id="recent-heading">最近项目</h2>
             <p>继续上次的制作细节</p>
           </div>
+          <button type="button">
+            查看全部 <span>→</span>
+          </button>
         </div>
 
         <div className="project-list">
@@ -194,7 +201,7 @@ export function WorkspacePage() {
               <Link
                 className="project-row"
                 key={project.id}
-                to={`/tasks/${project.taskId}`}
+                to={`/editor/${project.taskId}`}
               >
                 <span className={`project-symbol symbol-${project.inputType}`}>
                   <InputIcon type={project.inputType} />

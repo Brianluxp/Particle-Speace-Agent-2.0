@@ -4,4 +4,5 @@ frontend/.vite/
 frontend/*.tsbuildinfo
 frontend/.env.local
 prds/
+error/
 .DS_Store

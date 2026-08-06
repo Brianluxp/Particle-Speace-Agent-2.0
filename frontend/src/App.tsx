@@ -51,7 +51,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "任务",
-    contextualRoute: "tasks",
+    contextualRoute: "models",
     icon: "tool",
     matches: (path: string) => path.startsWith("/tasks/"),
   },
@@ -176,6 +176,7 @@ export function App() {
         </Link>
         <span className="workspace-label">项目工作台</span>
         <div className="topbar-status">
+          <span className="saved-status">✓ 已保存</span>
           <button
             className="icon-button"
             type="button"
@@ -215,7 +216,7 @@ export function App() {
             const destination = item.contextualRoute
               ? item.contextualRoute === "tasks"
                 ? `/tasks/${navigationTargets.taskId}`
-                : `/models/${navigationTargets.modelTaskId}`
+                : `/editor/${navigationTargets.editorTaskId}`
               : item.to;
 
             if (!destination) {

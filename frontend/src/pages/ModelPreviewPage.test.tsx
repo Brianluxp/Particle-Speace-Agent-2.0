@@ -130,6 +130,22 @@ describe("ModelPreviewPage", () => {
     expect(document.querySelector("model-viewer")).not.toBeInTheDocument();
   });
 
+  test("falls back to the SVG placeholder when the poster image fails", async () => {
+    vi.mocked(getTask).mockResolvedValue(
+      makeTask("completed", "https://example.com/valve.glb"),
+    );
+    const { container } = renderPreview();
+
+    await screen.findByRole("heading", { name: "3D 模型预览" });
+    const poster = container.querySelector('img[slot="poster"]') as HTMLImageElement;
+    expect(poster).not.toBeNull();
+    fireEvent.error(poster);
+
+    await waitFor(() => {
+      expect(poster.getAttribute("src")).toBe("/valve-actuator-viewport.svg");
+    });
+  });
+
   test("shows a Chinese error state when the model fails to load", async () => {
     vi.mocked(getTask).mockResolvedValue(
       makeTask("completed", "https://example.com/broken.glb"),
